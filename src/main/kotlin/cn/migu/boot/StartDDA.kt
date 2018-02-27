@@ -16,7 +16,6 @@ object StartDDA {
 
     val log = LoggerFactory.getLogger(StartDDA::class.java)
 
-
     @JvmStatic
     fun main(args: Array<String>) {
         val filename = "/Users/guxichang/code-src/dda-kt/src/main/resources/dda.cfg"
@@ -53,6 +52,5 @@ object StartDDA {
                     k.ip
             })
         }
-
     }
 }
