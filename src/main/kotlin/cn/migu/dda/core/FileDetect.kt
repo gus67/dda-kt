@@ -11,6 +11,7 @@ class FileDetect : FileAlterationListenerAdaptor() {
 
     override fun onFileCreate(file: File) {
         if (!file.name.toUpperCase().endsWith(".TMP")
+                && !file.name.toUpperCase().endsWith(".DDA")
                 && !file.name.toUpperCase().endsWith(".SWP")
                 && !file.name.toUpperCase().endsWith(".FILEPART")
                 && !file.name.toUpperCase().endsWith(".READY")
