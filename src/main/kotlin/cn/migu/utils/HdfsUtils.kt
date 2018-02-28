@@ -51,7 +51,6 @@ class HdfsUtils {
             hdfs.close()
 
 
-
         } catch (e: Exception) {
 
             log.error("found fatal error！ write $filePath to ${hdfsSink.path}--->", e.fillInStackTrace())
