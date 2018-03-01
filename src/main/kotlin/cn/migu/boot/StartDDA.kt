@@ -34,11 +34,27 @@ object StartDDA {
         // 开始监控
         monitor.start()
 
+
+        /**
+         * 队列消费
+         * 1、找出所有sink->quene[DDAFile]
+         * 2、为每一个队列卡开启一个线程
+         */
         for (key in InitDDA.regQuene.keys) {
             Executors.newSingleThreadExecutor().submit({
                 val abq = InitDDA.regQuene[key]
 
                 //每一个队列一个线程，开启循环模式
+                /**
+                 * 1、判断文件是否需要插件转换
+                 * 2、对文件转码试试
+                 * 3、对大文件分割
+                 * 4、传输
+                 * 5、改名
+                 * 6、对kafka数据保证容错
+                 * 7、hdfs和ftp不需要保证容错，覆盖无影响
+                 *
+                 */
                 while (true) {
                     val fp = abq!!.take()
                     val path = fp.path

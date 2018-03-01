@@ -1,31 +1,17 @@
 package cn.migu.boot
 
 import org.slf4j.LoggerFactory
-import java.util.*
-import java.util.concurrent.Executors
+
 
 val log = LoggerFactory.getLogger("")
 
 fun main(args: Array<String>) {
 
+    val clz = Class.forName("cn.migu.utils.TestRreflect")
+    val o = clz.newInstance()
+    val m = clz.getMethod("foo", Int::class.javaPrimitiveType, String::class.java)
+    m.invoke(o, 1, "sdd")
 
-    for (x in 1..5) {
-
-        Executors.newSingleThreadExecutor().submit({
-
-            for (a in 1..20) {
-                try {
-                    println(a)
-                    val k1 = (Random().nextInt(2))
-                    println(k1)
-                    a / k1
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        })
-
-    }
 
 }
 

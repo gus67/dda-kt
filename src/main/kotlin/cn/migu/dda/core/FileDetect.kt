@@ -7,7 +7,16 @@ import java.io.File
 
 class FileDetect : FileAlterationListenerAdaptor() {
 
-    val log = LoggerFactory.getLogger(FileDetect::class.java)
+    val log = LoggerFactory.getLogger(FileDetect::class.java)!!
+
+    /**
+     * 监控逻辑
+     * 1、发现了新文件
+     * 2、文件后缀过滤
+     * 3、文件正则过滤
+     * 4、从regSinkinkMap中找出正则和输出源对应关系
+     * 5、从regSinkinkMap获得sink对象，迭代存入regQuene，形成sink->quene[DDAFile]
+     */
 
     override fun onFileCreate(file: File) {
         if (!file.name.toUpperCase().endsWith(".TMP")
@@ -21,13 +30,8 @@ class FileDetect : FileAlterationListenerAdaptor() {
             //发现了新的文件先对文件进行正则过滤
             val regSet = InitDDA.regSinkinkMap.keys
 
-            /**
-             * 文件扔到对应的队列中
-             * 队列中的内容
-             * HdfsSink(path='hdfs://172.18.111.3:9000/gus/g1/')=[DDAFile(path='2.log1', clazz='cn.gus.ParseExcel')],
-             * HdfsSink(path='hdfs://172.18.111.3:9000/gus/g2/')=[DDAFile(path='2.log2', clazz='NA')
-             */
             for (k in regSet) {
+
                 if (Regex(k).matches(file.name)) {
 
                     val sinks = InitDDA.regSinkinkMap[k]

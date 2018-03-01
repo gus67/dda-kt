@@ -13,10 +13,13 @@ object InitDDA {
     val regSinkinkMap = hashMapOf<String, ArrayList<Any>>()
     //监控目录的根路径
     var rootPath: String? = null
+
     //正则队列对应关系,阻塞队列
     val regQuene = hashMapOf<Any, ArrayBlockingQueue<DDAFile>>()
+
     //队列边界最大长度，否则阻塞
     val MAX_QUENE_LENGTH = 65535
+
     //正则和和解析类对应关系
     val regClazz = hashMapOf<String, String>()
 

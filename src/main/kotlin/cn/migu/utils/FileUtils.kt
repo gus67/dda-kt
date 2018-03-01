@@ -13,4 +13,16 @@ object FileUtils {
                 .filter { it.extension != "COMPLETE" }
                 .forEach(::println)
     }
+
+    /**
+     * 插件化转换
+     * "0" 失败
+     * "1" 成功
+     */
+    fun reflectPlugin(clazzName: String, methodName: String, filePath: String): String {
+        val clz = Class.forName(clazzName)
+        val o = clz.newInstance()
+        val m = clz.getMethod(methodName, Int::class.javaPrimitiveType, String::class.java)
+        return m.invoke(o, filePath, filePath + ".TRANSITION").toString()
+    }
 }
