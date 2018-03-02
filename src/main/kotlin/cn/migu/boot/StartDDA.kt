@@ -5,6 +5,7 @@ import cn.migu.dda.core.InitDDA
 import cn.migu.dda.vo.FtpSink
 import cn.migu.dda.vo.HdfsSink
 import cn.migu.dda.vo.KafkaSink
+import org.apache.commons.io.FileUtils
 import org.apache.commons.io.monitor.FileAlterationMonitor
 import org.apache.commons.io.monitor.FileAlterationObserver
 import org.slf4j.LoggerFactory
@@ -16,7 +17,9 @@ import java.util.concurrent.TimeUnit
 
 object StartDDA {
 
-    val log = LoggerFactory.getLogger(StartDDA::class.java)
+    val log = LoggerFactory.getLogger("localFile")
+
+    //val incomplete = LoggerFactory.getLogger("incomplete")
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -24,7 +27,19 @@ object StartDDA {
 
         InitDDA.initDDA(filename)
 
-        log.info(InitDDA.rootPath)
+        //incomplete.info("incomplete")
+
+        val suFile = File("./.INCOMPLETE")
+        if (!suFile.exists()) {
+            try {
+                suFile.createNewFile()
+            } catch (e: Exception) {
+                log.error("ERROR---->", e.fillInStackTrace())
+                return
+            }
+        }
+
+        log.info("\u001b[32;1m根目录----> ${InitDDA.rootPath} \u001B[0m\n")
 
         val interval = TimeUnit.SECONDS.toMillis(1)
         val observer = FileAlterationObserver(File(InitDDA.rootPath))
@@ -51,26 +66,31 @@ object StartDDA {
                  * 3、对大文件分割
                  * 4、传输
                  * 5、改名
-                 * 6、对kafka数据保证容错
+                 * 6、对kafka数据需要保证容错
                  * 7、hdfs和ftp不需要保证容错，覆盖无影响
                  *
                  */
                 while (true) {
-                    val fp = abq!!.take()
-                    val path = fp.path
-                    val clazz = fp.clazz
-                    /**
-                     * 反射插件
-                     * 文件现文件本地化
-                     * 失败回放
-                     */
-                    if (key is KafkaSink) {
-                        key.bootServr
-                        key.topic
-                    } else if (key is HdfsSink) {
-                        key.path
-                    } else if (key is FtpSink) {
-                        key.ip
+                    try {
+                        val fp = abq!!.take()
+                        val path = fp.path
+                        val clazz = fp.clazz
+                        /**
+                         * 反射插件
+                         * 文件现文件本地化
+                         * 失败回放
+                         */
+                        if (key is KafkaSink) {
+                            log.info("\u001b[33;1mkafkaSink队列处理数据--->${key.bootServr},${key.topic}\u001B[0m\n")
+
+
+                        } else if (key is HdfsSink) {
+                            log.info("\u001b[33;1mhdfsSink队列处理数据--->${key.path}\u001B[0m\n")
+                        } else if (key is FtpSink) {
+                            log.info("\u001b[33;1mftpSink队列处理数据--->${key.ip},${key.port},${key.name},${key.passwd},${key.path}\u001B[0m\n")
+                        }
+                    } catch (e: Exception) {
+
                     }
                 }
             })
@@ -82,8 +102,23 @@ object StartDDA {
         p.waitFor()
         val text = p.text()
         if (text.toLowerCase().indexOf("iso-8859-1") != -1) {
-            val ptr = "iconv -f gbk -t utf-8 $filePath -o $filePath.READY".execute()
-            if (ptr.waitFor() == 0) {
+
+            /**
+             * 多个线程同时读，需要保护一下,考虑移到另一个目录下
+             */
+
+            FileUtils.copyFile(File(filePath), File("./tmp/"))
+
+            var ptr: Process? = null
+            if (InitDDA.os.indexOf("linux") != -1) {
+                ptr = "iconv -f gbk -t utf-8 $filePath -o $filePath.READY".execute()
+            } else if (InitDDA.os.indexOf("mac") != -1) {
+                ptr = "iconv -c -f gbk -t utf-8 $filePath > $filePath.READY".execute()
+            } else {
+                log.error("不支持win")
+                System.exit(1)
+            }
+            if (ptr?.waitFor() == 0) {
 
             }
         }

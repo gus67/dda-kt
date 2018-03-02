@@ -1,6 +1,8 @@
 package cn.migu.utils
 
 import cn.migu.dda.vo.KafkaSink
+import org.apache.commons.io.FileUtils
+import org.apache.hadoop.fs.FileUtil
 import java.util.*
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -19,9 +21,12 @@ class KafkaProducerUtils {
         val sinks = kafkaSink.topic.split(",")
 
         for (sink in sinks) {
+
             val props = Properties()
             props.put("bootstrap.servers", kafkaSink.bootServr)
             props.put("transactional.id", System.currentTimeMillis())
+            props.put("acks", "all")
+
             val producer = KafkaProducer(props, StringSerializer(), StringSerializer())
             producer.initTransactions()
             try {
@@ -31,6 +36,15 @@ class KafkaProducerUtils {
                     producer.send(ProducerRecord(sink, "", it))
                 }
                 producer.commitTransaction()
+
+                /**
+                 * 写入文件
+                 */
+
+
+                FileUtils.moveFile(File("$filePath"), File("$filePath.KAFKA.COMPLETE"))
+
+
             } catch (e: ProducerFencedException) {
                 producer.close()
             } catch (e: OutOfOrderSequenceException) {

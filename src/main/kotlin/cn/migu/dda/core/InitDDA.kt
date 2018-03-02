@@ -10,6 +10,9 @@ import java.util.concurrent.ArrayBlockingQueue
 object InitDDA {
 
     //正则和输出源对应关系，一对多
+    /**
+     * Any={KafkaSin,HdfsSink,FtpSink}
+     */
     val regSinkinkMap = hashMapOf<String, ArrayList<Any>>()
     //监控目录的根路径
     var rootPath: String? = null
@@ -22,6 +25,8 @@ object InitDDA {
 
     //正则和和解析类对应关系
     val regClazz = hashMapOf<String, String>()
+
+    val os = System.getProperty("os.name")
 
     fun initDDA(configPath: String) {
         val file = File(configPath)

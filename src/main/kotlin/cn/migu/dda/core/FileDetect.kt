@@ -7,7 +7,7 @@ import java.io.File
 
 class FileDetect : FileAlterationListenerAdaptor() {
 
-    val log = LoggerFactory.getLogger(FileDetect::class.java)!!
+    val log = LoggerFactory.getLogger("localFile")!!
 
     /**
      * 监控逻辑
@@ -24,6 +24,9 @@ class FileDetect : FileAlterationListenerAdaptor() {
                 && !file.name.toUpperCase().endsWith(".SWP")
                 && !file.name.toUpperCase().endsWith(".FILEPART")
                 && !file.name.toUpperCase().endsWith(".READY")
+                && !file.name.toUpperCase().endsWith(".KAFKA")
+                && !file.name.toUpperCase().endsWith(".HDFS")
+                && !file.name.toUpperCase().endsWith(".FTP")
                 && !file.name.toUpperCase().endsWith(".COMPLETE")
                 && !file.name.toUpperCase().endsWith(".TRANSITION")) {
 
@@ -40,7 +43,8 @@ class FileDetect : FileAlterationListenerAdaptor() {
 
                         InitDDA.regQuene[sink]?.put(DDAFile(file.name, InitDDA.regClazz[k]!!))
 
-                        log.info("find file ---->${file.name} in reg---->$k to quene---->$sink")
+                        log.info("\u001b[34;1mfind file ---->${file.name} in reg----> $k to quene----> $sink\u001b[0m\n")
+
                     }
                 }
             }

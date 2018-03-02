@@ -2,7 +2,8 @@ package cn.migu.utils
 
 import java.io.File
 
-object FileUtils {
+object FileUtil4ADD {
+
 
     //遍历文件数并过滤
     fun traverseFileTree() {
